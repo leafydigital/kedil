@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PAGE TITLE HERE -->
+    <title> Kedil - Finance Management Application</title>
+
+    <!-- FAVICONS ICON -->
+    <link rel="shortcut icon" type="image/png" href="images/favicon.png">
+    <link href="vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+    <link href="vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="vendor/jquery-autocomplete/jquery-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <link href="vendor/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Clockpicker -->
+    <link href="vendor/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
+    <!-- asColorpicker -->
+    <link href="vendor/jquery-asColorPicker/css/asColorPicker.min.css" rel="stylesheet">
+    <!-- Material color picker -->
+    <link href="vendor/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
+
+    <!-- Pick date -->
+    <link rel="stylesheet" href="./vendor/pickadate/themes/default.css">
+    <link rel="stylesheet" href="./vendor/pickadate/themes/default.date.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+    <!-- Style css -->
+
+    <link href="css/style.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .d-flex {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+
+        .d-flex-gap-20 {
+            display: flex;
+            justify-content: flex-start;
+            /* gap: 20px; */
+            width: 100%;
+            text-align: left;
+            align-items: center;
+        }
+
+        .fa-solid {
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        option {
+            color: black;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-trash-arrow-up {
+            color: green;
+        }
+
+        .category-header {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .budget-row .name {
+            flex: 2;
+        }
+
+        .budget-row .assigned,
+        .budget-row .activity,
+        .budget-row .available {
+            flex: 1;
+            text-align: right;
+        }
+
+        .budget-row .available.green {
+            color: green;
+        }
+
+        .budget-row .available.red {
+            color: red;
+        }
+
+        .accordion-item {
+            background-color: transparent !important;
+            color: #000;
+            margin-bottom: 15px;
+            border: none;
+            margin-top: 15px;
+        }
+
+        .accordion-button {
+            background-color: #00b70e;
+            color: white !important;
+            font-size: 18px;
+            display: block !important;
+        }
+
+
+        .accordion-button:not(.collapsed) {
+            background-color: #00b70e;
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            border-color: #00b70e;
+            box-shadow: none;
+        }
+
+        .accordion-header {
+            padding: 5px 15px;
+            background-color: #00b70e;
+            font-weight: 600;
+            font-size: 20px;
+            color: white;
+        }
+
+        .custom-accordion-header {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .custom-accordion-header .category-name {
+            flex-grow: 1;
+        }
+
+        .custom-accordion-header span {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .accordion-button::after {
+            margin-left: auto;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .header-row .name {
+            flex: 2;
+        }
+
+        .header-row .assigned,
+        .header-row .activity,
+        .header-row .available {
+            flex: 1;
+            text-align: right;
+            font-size: 17px;
+        }
+
+        .accordion-heading {
+            background-color: transparent !important;
+            color: black !important;
+            height: 55px !important;
+            border-radius: 10px !important;
+            text-align: center;
+            border: 1px solid #00b70e;
+        }
+
+        .fa-plus {
+            background-color: #000000;
+            border-radius: 50px;
+            padding: 4px;
+            color: white;
+            width: 20px;
+            font-size: 12px;
+            height: 20px;
+            margin: 10px;
+        }
+
+        .budget-month i {
+            font-size: 20px;
+            color: #000;
+        }
+
+        .month-picker {
+            border: none;
+            font-size: 25px;
+        }
+
+        .unassinged-amount {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ready-to-assign {
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            /* background-color: #00b70e; */
+            color: white;
+        }
+
+        .assign-btn {
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 15px;
+            border: none;
+            background-color: #007909;
+            color: white;
+        }
+
+        .month-display {
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #000;
+            font-size: 20px;
+        }
+
+        .month-picker-popup {
+            position: absolute;
+            top: 100%;
+            background-color: white;
+            width: 250px;
+            z-index: 1000;
+            color: #000;
+        }
+
+        .month-option {
+            width: 60px;
+            text-align: center;
+            padding: 5px 0;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .month-option:hover,
+        .month-option.active {
+            background-color: #4c7cf3;
+            color: rgb(0, 0, 0);
+        }
+
+        .ready-to-assign .amount {
+            font-size: 20px;
+        }
+
+        .tooltip-popup {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+
+        .tooltip-popup input {
+            width: 200px;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+
+        #newGroup,
+        #newCategory {
+            border: 1px solid #00b70e;
+            color: #000;
+        }
+
+        .bg-success{
+            background-color: #00b70e !important;
+        }
+
+        #newGroup::placeholder,
+        #newCategory::placeholder {
+            color: #999 !important;
+            opacity: 1 !important;
+        }
+
+        .accordion-toggle-icon {
+            margin-right: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .arrow-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .accordion-body {
+            font-size: 15px;
+        }
+
+        .editable-amount {
+            padding: 4px 0px 4px 0px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 35px;
+        }
+
+        .editable-amount:focus {
+            border: 1px solid #007bff;
+            outline: none;
+        }
+
+        .green-bg {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .red-bg {
+            color: #dc3545;
+            font-weight: 600;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div class="nav-header">
+
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse justify-content-between">
+                    <div class="header-left">
+                        <div class="dashboard_bar" id="pageTitle">
+                            Budget
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 🔷 Sidebar Navigation (dlabnav) -->
+    <nav class="dlabnav">
+
+    </nav>
+
+    <div class="content-body" id="content-body">
+
+        <div class="container-fluid">
+
+            <div class="d-flex">
+
+                <div class="d-flex budget-month position-relative">
+                    <div class="d-flex gap-2 align-items-center">
+                        <i class="fa fa-arrow-left" id="prevMonth"></i>
+
+                        <div id="monthDisplay" class="month-display" onclick="toggleMonthPicker()">
+                            Apr 2025 <i class="fa fa-caret-down ms-2"></i>
+                        </div>
+
+                        <i class="fa fa-arrow-right" id="nextMonth"></i>
+                    </div>
+
+                    <div class="month-picker-popup shadow rounded p-3" id="monthPicker" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <i class="fa fa-arrow-left" onclick="changeYear(-1)"></i>
+                            <div id="yearDisplay" class="fw-bold fs-5">2025</div>
+                            <i class="fa fa-arrow-right" onclick="changeYear(1)"></i>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <!-- JS will fill months -->
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="ready-to-assign">
+
+                    <div class="d-flex unassinged-amount">
+                        <span class="amount" id="unassinged-amount">
+                            $ 1500
+                        </span>
+                        <span class="text">
+                            Ready to Assign
+                        </span>
+                    </div>
+                    <div>
+                        <button class="assign-btn"> Assign <i class="fa fa-arrow-down"></i> </button>
+                    </div>
+                </div>
+
+                <div style="background-color: rgb(0, 217, 255);">
+
+
+                </div>
+
+            </div>
+
+            <div class="accordion-item m-t-10">
+                <h2 class="accordion-header accordion-heading">
+                    <div class="d-flex">
+                        <div class="d-flex-gap-20">
+                            <div>
+
+                            </div>
+                            <div class="name d-flex">
+                                CATEGORY
+
+                                <span>
+                                    <a title="Create New Group"><i class="fa fa-plus plus-icon-group"></i></a>
+                                </span>
+
+                            </div>
+
+                        </div>
+                        <div class="header-row">
+                            <div class="assigned">ASSIGNED</div>
+                            <div class="activity">ACTIVITY</div>
+                            <div class="available">AVAILABLE</div>
+                        </div>
+                    </div>
+                </h2>
+
+            </div>
+
+            <div class="accordion" id="budgetAccordion">
+
+            </div>
+
+
+            <div class="tooltip-popup" id="groupPopup">
+                <div class="unassinged-amount">
+                    <div>
+                        <input type="text" class="form-control" id="newGroup" placeholder="New Category Group" />
+                    </div>
+                    <div class="d-flex-gap-20">
+                        <button id="addGroupBtn" class="form-control bg-success" onclick="saveGroupName()">Save</button>
+                        <button id="cancelGroupBtn" class="form-control bg-danger">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tooltip-popup" id="categoryPopup">
+                <div class="unassinged-amount">
+                    <div>
+                        <input type="text" class="form-control" id="newCategory" placeholder="New Category" />
+                    </div>
+                    <div class="d-flex-gap-20">
+                        <button id="addCategoryBtn" class="form-control bg-success"
+                            onclick="saveCategory()">Save</button>
+                        <button id="cancelCategoryBtn" class="form-control bg-danger">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <div class="footer">
+
+    </div>
+
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+
+    <script defer src="js/menu.js"></script> <!-- Link to JS -->
+
+    <script src="vendor/global/global.min.js"></script>
+
+    <script src="js/custom.js"></script>
+    <script src="vendor/jquery-nice-select/js/jquery.nice-select.min.js"></script>
+
+    <script src="vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="js/plugins-init/sweetalert.init.js"></script>
+
+    <script src="vendor/moment/moment.min.js"></script>
+
+    <script src="vendor/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+
+    <script src="js/plugins-init/material-date-picker-init.js"></script>
+
+    <!-- Chart piety plugin files -->
+    <script src="vendor/peity/jquery.peity.min.js"></script>
+    <!-- Chartist -->
+    <script src="vendor/jquery-autocomplete/jquery-ui.js"></script>
+
+    <script src="js/custom.min.js"></script>
+    <script src="js/dlabnav-init.js"></script>
+
+    <script src="js/group.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        //fetchDefault();
+
+        $(document).ready(function () {
+
+            updateDisplay();
+
+        });
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let selectedMonth = new Date().getMonth();
+        let selectedYear = new Date().getFullYear();
+
+        function toggleMonthPicker() {
+            document.getElementById('monthPicker').style.display = 'block';
+            renderMonths();
+        }
+
+        function changeYear(diff) {
+            selectedYear += diff;
+            renderMonths();
+        }
+
+        function selectMonth(index) {
+            selectedMonth = index;
+            updateDisplay();
+            document.getElementById('monthPicker').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            document.getElementById('monthDisplay').innerText = `${monthNames[selectedMonth]} ${selectedYear}`;
+
+            loadBudgets();
+        }
+
+        function renderMonths() {
+            document.getElementById('yearDisplay').innerText = selectedYear;
+            const container = document.querySelector('#monthPicker .d-flex.flex-wrap');
+            container.innerHTML = '';
+            monthNames.forEach((name, index) => {
+                const div = document.createElement('div');
+                div.classList.add('month-option');
+                if (index === selectedMonth) div.classList.add('active');
+                div.innerText = name;
+                div.onclick = () => selectMonth(index);
+                container.appendChild(div);
+            });
+        }
+
+        // Optional: next/prev arrows
+        document.getElementById('prevMonth').onclick = () => {
+            selectedMonth--;
+            if (selectedMonth < 0) {
+                selectedMonth = 11;
+                selectedYear--;
+            }
+            updateDisplay();
+        };
+
+        document.getElementById('nextMonth').onclick = () => {
+            selectedMonth++;
+            if (selectedMonth > 11) {
+                selectedMonth = 0;
+                selectedYear++;
+            }
+            updateDisplay();
+        };
+
+
+
+    </script>
+
+</body>
+
+</html>

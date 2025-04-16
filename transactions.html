@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PAGE TITLE HERE -->
+    <title> Kedil - Finance Management Application</title>
+
+    <!-- FAVICONS ICON -->
+    <link rel="shortcut icon" type="image/png" href="images/favicon.png">
+    <link href="vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+    <link href="vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="vendor/jquery-autocomplete/jquery-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <link href="vendor/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Clockpicker -->
+    <link href="vendor/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
+    <!-- asColorpicker -->
+    <link href="vendor/jquery-asColorPicker/css/asColorPicker.min.css" rel="stylesheet">
+    <!-- Material color picker -->
+    <link href="vendor/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
+
+    <!-- Pick date -->
+    <link rel="stylesheet" href="./vendor/pickadate/themes/default.css">
+    <link rel="stylesheet" href="./vendor/pickadate/themes/default.date.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+    <!-- Style css -->
+
+    <link href="css/style.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .d-flex {
+            justify-content: flex-end
+        }
+
+        .d-flex-gap-20 {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .fa-solid {
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        option {
+            color: black;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-trash-arrow-up {
+            color: green;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div class="nav-header">
+
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse justify-content-between">
+                    <div class="header-left">
+                        <div class="dashboard_bar" id="pageTitle">
+                            Transactions
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 🔷 Sidebar Navigation (dlabnav) -->
+    <nav class="dlabnav">
+
+    </nav>
+
+    <div class="content-body" id="content-body">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center mb-4 flex-wrap">
+
+                <div class="d-flex-gap-20">
+                    <button class="dashboard-select dark" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                        Add
+                        Transaction </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="table-responsive ">
+                        <table
+                            class="table-responsive-lg table display mb-4 dataTablesCard order-table card-table text-black dataTable no-footer student-tbl"
+                            id="tableTransactions">
+                            <thead>
+                                <tr>
+                                    <th>Transaction Date</th>
+                                    <th>Payee</th>
+                                    <th>Description</th>
+                                    <th>Group</th>
+                                    <th>Category</th>
+                                    <th>Credit / Debit</th>
+                                    <th>Bank</th>                                    
+                                    <th>Amount</th>
+                                    <th>Active Status</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Modal -->
+        <div class="modal bd-example-modal-lg fade" id="addTransactionModal" tabindex="-1"
+            aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered  modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel1">Add Transaction</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <label for="txtTranDate" class="form-label d-block">Transaction Date</label>
+                                <input type="date" id="txtTranDate" class="form-control w-100 mb-3"
+                                    placeholder="Transaction Date">
+
+                                <label for="ddlVendor" class="form-label d-block">Choose Payee</label>
+                                <select id="ddlVendor" class="form-control w-100 mb-3">
+                                </select>
+
+                                <label for="ddlGroups" class="form-label d-block">Choose Group</label>
+                                <select id="ddlGroups" class="form-control w-100 mb-3">
+
+                                </select>
+
+                                <label for="ddlCategories" class="form-label d-block">Choose Category</label>
+                                <select id="ddlCategories" class="form-control w-100 mb-3">
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label for="ddlTranType" class="form-label d-block">Transaction Type</label>
+                                <select id="ddlTranType" class="form-control w-100 mb-3">
+                                    <option value="1">Debit</option>
+                                    <option value="2">Credit</option>
+                                </select>
+
+
+                                <label for="txtTranAmount" class="form-label d-block">Enter Amount</label>
+                                <input type="number" id="txtTranAmount" class="form-control w-100 mb-3"
+                                    placeholder="Transaction Amount">
+
+                                <label for="txtTranDesc" class="form-label d-block">Enter Transaction
+                                    Description</label>
+                                <textarea type="number" id="txtTranDesc" class="form-control w-100 mb-3"
+                                    placeholder="Transaction Description" rows="2"> </textarea>
+
+                                <label for="ddlBank" class="form-label d-block">Choose Bank Account</label>
+                                <select id="ddlBank" class="form-control w-100 mb-3">
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="saveTransaction()">Save
+                            changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+    </div>
+
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+
+    <script defer src="js/menu.js"></script> <!-- Link to JS -->
+
+    <script src="vendor/global/global.min.js"></script>
+
+    <script src="js/custom.js"></script>
+    <script src="vendor/jquery-nice-select/js/jquery.nice-select.min.js"></script>
+
+    <script src="vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="js/plugins-init/sweetalert.init.js"></script>
+
+    <script src="vendor/moment/moment.min.js"></script>
+
+    <script src="vendor/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+
+    <script src="js/plugins-init/material-date-picker-init.js"></script>
+
+    <!-- Chart piety plugin files -->
+    <script src="vendor/peity/jquery.peity.min.js"></script>
+    <!-- Chartist -->
+    <script src="vendor/jquery-autocomplete/jquery-ui.js"></script>
+
+    <script src="js/custom.min.js"></script>
+    <script src="js/dlabnav-init.js"></script>
+
+    <script src="js/transactions.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        fetchDefault();
+
+    </script>
+
+</body>
+
+</html>
