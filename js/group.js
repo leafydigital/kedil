@@ -1,4 +1,4 @@
-var URL = CONFIG.API_BASE_URL; // "http://localhost:5000/api";
+var URL = CONFIG.API_BASE_URL;
 
 function fetchGroups() {
 

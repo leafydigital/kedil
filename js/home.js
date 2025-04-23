@@ -1,4 +1,4 @@
-var URL = "http://localhost:5000/api"
+var URL = CONFIG.API_BASE_URL;
 
 const form = document.getElementById('registrationForm');
 const message = document.getElementById('message');
