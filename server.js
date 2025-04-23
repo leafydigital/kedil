@@ -11,7 +11,9 @@ app.use(express.json());
 
 const allowedOrigins = [
   "https://6808968d2d6171ccf2cb035c--kedil.netlify.app",
-  "https://wanderbreezeexim.com"
+  "https://wanderbreezeexim.com",
+  "http://127.0.0.1:5501",
+  "http://localhost:5501",
 ];
 
 
@@ -20,15 +22,15 @@ app.use(cors({
       if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
       } else {
-          callback(new Error("Not allowed by CORS"));
+          callback(new Error("Origin " + origin));
       }
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 
-app.use(cors());
+//app.use(cors());
 
 app.use(verifyToken);
 
