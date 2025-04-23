@@ -216,35 +216,88 @@ function saveCategory() {
 
     let token = localStorage.getItem("AuthToken");
 
-    $.ajax({
-        url: URL + "/groupcategory/createcategory",
-        method: "POST",
-        contentType: "application/json",
-        headers: {
-            "Authorization": "Bearer " + token
-        },
-        data: JSON.stringify({
-            category_name: categoryName,
-            group_id: groupId
-        }),
-        success: function (response) {
+    if (groupId == 0) {
+        $.ajax({
+            url: URL + "/groupcategory/creategroup",
+            method: "POST",
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                group_name: selectedGroupName
+            }),
+            success: function (response) {
 
-            if (response.category_name != null && response.category_name != undefined) {
-                $('#categoryPopup').fadeOut();
-                $('#newCategory').val('');
+                if (response.group_name != null && response.group_name != undefined) {
+                    $.ajax({
+                        url: URL + "/groupcategory/createcategory",
+                        method: "POST",
+                        contentType: "application/json",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        },
+                        data: JSON.stringify({
+                            category_name: categoryName,
+                            group_id: response._id
+                        }),
+                        success: function (response) {
 
-                selectedGroupId = null;
+                            if (response.category_name != null && response.category_name != undefined) {
+                                $('#categoryPopup').fadeOut();
+                                $('#newCategory').val('');
 
-                loadBudgets();
+                                selectedGroupId = null;
 
+                                selectedGroupName = null;
+
+                                loadBudgets();
+
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            sweetAlert("Oops...", xhr.responseJSON.message, "error");
+                        }
+                    });
+
+                }
+            },
+            error: function (xhr, status, error) {
+                sweetAlert("Oops...", xhr.responseJSON.message, "error");
             }
-        },
-        error: function (xhr, status, error) {
-            sweetAlert("Oops...", xhr.responseJSON.message, "error");
-        }
-    });
+        });
+    }
+    else {
+        $.ajax({
+            url: URL + "/groupcategory/createcategory",
+            method: "POST",
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                category_name: categoryName,
+                group_id: groupId
+            }),
+            success: function (response) {
 
+                if (response.category_name != null && response.category_name != undefined) {
+                    $('#categoryPopup').fadeOut();
+                    $('#newCategory').val('');
 
+                    selectedGroupId = null;
+
+                    selectedGroupName = null;
+
+                    loadBudgets();
+
+                }
+            },
+            error: function (xhr, status, error) {
+                sweetAlert("Oops...", xhr.responseJSON.message, "error");
+            }
+        });
+    }
 
 }
 
@@ -466,7 +519,7 @@ async function loadBudgets() {
                                 </button>
                             </div>
                             <div class="name d-flex">${groupName}
-                                <span><a title="Create Category"><i class="fa fa-plus plus-icon-category" data-group-id="${groupId}"></i></a></span>
+                                <span><a title="Create Category"><i class="fa fa-plus plus-icon-category" data-group-id="${groupId}" data-group-name="${groupName}"></i></a></span>
                             </div>
                         </div>
                         <div class="header-row">
@@ -544,7 +597,7 @@ $('#cancelGroupBtn').on('click', function () {
     $('#newGroup').val('');
 });
 
-var selectedGroupId = null;
+var selectedGroupId = null, selectedGroupName = null;
 
 $(document).on('click', '.plus-icon-category', function (e) {
     const offset = $(this).offset();
@@ -553,6 +606,8 @@ $(document).on('click', '.plus-icon-category', function (e) {
         .fadeIn();
 
     selectedGroupId = $(this).data('group-id');
+
+    selectedGroupName = $(this).data('group-name');
 
     // Store the clicked row for appending new category
     $('#categoryPopup').data('row', $(this).closest('tr'));

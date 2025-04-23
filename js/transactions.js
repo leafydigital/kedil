@@ -66,7 +66,7 @@ function fetchTransactions() {
                 },
             },
             {
-                data: "bank_account.bank_nick_name",
+                data: "bank_account.bank_name",
                 render: function (data, type, row) {
                     return `<span class="editable" data-id="${row._id}" data-field="group_id">${data}</span>`;
                 },
@@ -117,10 +117,10 @@ function fetchTransactions() {
         searching: true,
         language: {
             paginate: {
-              previous: "Prev",
-              next: "Next"
+                previous: "Prev",
+                next: "Next"
             }
-          }
+        }
     });
 
     let editingRow = null; // To track the currently edited row
@@ -202,64 +202,64 @@ function fetchTransactions() {
             var transactionDate = $rowEl.find('td:eq(0) input').val();
 
             var vendor = $rowEl.find('td:eq(1) select').val();
-        
+
             var group = $rowEl.find('td:eq(3) select').val();
-        
+
             var category = $rowEl.find('td:eq(4) select').val();
-        
+
             var transactionType = $rowEl.find('td:eq(5) select').val();
-        
+
             var amount = parseFloat($rowEl.find('td:eq(7) input').val());
-        
+
             var description = $rowEl.find('td:eq(2) input').val();
-        
+
             var bank = $rowEl.find('td:eq(6) select').val();
 
             if (transactionDate == "" || transactionDate == null) {
                 sweetAlert("Oops...", "Choose a valid transaction date", "error");
-        
+
                 return;
             }
-        
+
             if (vendor == "" || vendor == null) {
                 sweetAlert("Oops...", "Choose a valid Vendor (If prefers nobody, choose Others)", "error");
-        
+
                 return;
             }
-        
+
             if (group == "" || group == null) {
                 sweetAlert("Oops...", "Choose a valid Group", "error");
-        
+
                 return;
             }
-        
+
             if (category == "" || category == null) {
                 sweetAlert("Oops...", "Choose a valid Category", "error");
-        
+
                 return;
             }
-        
+
             if (transactionType == "" || transactionType == null) {
                 sweetAlert("Oops...", "Choose a valid transaction type", "error");
-        
+
                 return;
             }
-        
+
             if (amount == "" || amount == null) {
                 sweetAlert("Oops...", "Enter a valid Amount", "error");
-        
+
                 return;
             }
-        
+
             if (description == "" || description == null) {
                 sweetAlert("Oops...", "Enter a valid description", "error");
-        
+
                 return;
             }
-        
+
             if (bank == "" || bank == null) {
                 sweetAlert("Oops...", "Choose a valid bank", "error");
-        
+
                 return;
             }
 
@@ -352,6 +352,9 @@ function fetchCategories(groupId) {
 
             categories = data;
 
+            $("#ddlCategories").append("<option value = '0'>  Choose CATEGORY  </option>");
+            $("#ddlCategories").append("<option value = '-1'> -- NEW CATEGORY -- </option>");
+
             data.forEach(element => {
 
                 if (element.is_active == true && element.group_id._id == groupId) {
@@ -441,6 +444,8 @@ function fetchVendors() {
 
             });
 
+            $("#ddlVendor").append("<option value = '0'> Others </option>");
+
             //console.log(response);
         },
         error: function (xhr, status, error) {
@@ -471,6 +476,9 @@ function fetchGroups() {
 
             groups = data;
 
+            $("#ddlGroups").append("<option value = '0'> Choose GROUP </option>");
+            $("#ddlGroups").append("<option value = '-1'> -- NEW GROUP -- </option>");
+
             data.forEach(element => {
 
                 if (element.is_active == true) {
@@ -487,19 +495,244 @@ function fetchGroups() {
     });
 }
 
-$("#ddlGroups").on("change", function () {
 
-    const selectedValue = $(this).val();
+// $("#ddlGroups").on("change", function () {
 
-    fetchCategories(selectedValue);
+function groupsChange(object) {
+    const selectedValue = $("#ddlGroups").val();
+
+    if (selectedValue == -1) {
+        const offset = $(object).offset();
+        $('#groupPopup')
+            .css({ top: offset.top + 20, left: offset.left })
+            .fadeIn();
+
+        // Store the clicked row for appending new category
+        $('#groupPopup').data('row', $(object).closest('tr'));
+    } else {
+        fetchCategories(selectedValue);
+    }
+}
+
+function categoryChange(object) {
+    const selectedValue = $("#ddlCategories").val();
+
+    if (selectedValue == -1) {
+        const offset = $(object).offset();
+        $('#categoryPopup')
+            .css({ top: offset.top + 20, left: offset.left })
+            .fadeIn();
+
+        // Store the clicked row for appending new category
+        $('#categoryPopup').data('row', $(object).closest('tr'));
+    }
+}
+
+// When clicking anywhere on the document
+$(document).on('click', function (e) {
+    const isGroupPopup = $(e.target).closest('#groupPopup, #ddlGroups').length > 0;
+    const isCategoryPopup = $(e.target).closest('#categoryPopup, #ddlCategories').length > 0;
+
+    if (!isGroupPopup) {
+        $('#groupPopup').fadeOut();
+    }
+
+    if (!isCategoryPopup) {
+        $('#categoryPopup').fadeOut();
+    }
+});
+
+function saveGroupName() {
+
+    var GroupName = $("#newGroup").val();
+
+    if (GroupName == "" || GroupName == null) {
+        sweetAlert("Oops...", "Enter a valid Group Name", "error");
+
+        return;
+    }
+
+    let token = localStorage.getItem("AuthToken");
+
+    $.ajax({
+        url: URL + "/groupcategory/creategroup",
+        method: "POST",
+        contentType: "application/json",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        data: JSON.stringify({
+            group_name: GroupName
+        }),
+        success: function (response) {
+
+            if (response.group_name != null && response.group_name != undefined) {
+                $('#groupPopup').fadeOut();
+                $('#newGroup').val('');
+
+                fetchGroups();
+
+                $("#ddlGroups").val(response._id).change();
+
+            }
+        },
+        error: function (xhr, status, error) {
+            sweetAlert("Oops...", xhr.responseJSON.message, "error");
+        }
+    });
+}
+
+function saveCategory() {
+
+    var categoryName = $("#newCategory").val();
+
+    if (categoryName == "" || categoryName == null) {
+        alert("Oops... Enter a valid Category Name");
+
+        return;
+    }
+
+    var groupId = $("#ddlGroups").val();
+
+    if (groupId == null || groupId == 0 || groupId == -1) {
+        alert("Oops... Please choose a valid Group");
+
+        return;
+    }
+
+    let token = localStorage.getItem("AuthToken");
+
+    $.ajax({
+        url: URL + "/groupcategory/createcategory",
+        method: "POST",
+        contentType: "application/json",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        data: JSON.stringify({
+            category_name: categoryName,
+            group_id: groupId
+        }),
+        success: function (response) {
+
+            if (response.category_name != null && response.category_name != undefined) {
+                $('#categoryPopup').fadeOut();
+                $('#newCategory').val('');
+
+                selectedGroupId = null;
+
+                selectedGroupName = null;
+
+                fetchCategories(groupId);
+
+                setTimeout(() => {
+                    $("#ddlCategories").val(response._id).change();
+                }, 2000);
+
+
+
+            }
+        },
+        error: function (xhr, status, error) {
+            sweetAlert("Oops...", xhr.responseJSON.message, "error");
+        }
+    });
+
+}
+
+
+document.getElementById('addTransactionBtn').addEventListener('click', function () {
+    const tableBody = document.querySelector('#tableTransactions tbody');
+
+    // Prevent multiple rows
+    if (document.querySelector('#inlineTransactionRow')) return;
+
+    const newRow = document.createElement('tr');
+    newRow.id = 'inlineTransactionRow';
+
+    newRow.innerHTML = `
+        <td><input type="date" class="form-control form-control-sm" id="txtTranDate"/></td>
+        <td>
+          <select id="payeeSelect" class="form-control form-control-sm payee-select" style="width: 150px;" id="ddlVendor" data-placeholder="Choose Payee">
+            <option value="">Select Payee</option>
+            <!-- dynamically add options from backend -->
+          </select>
+        </td>
+        <td><input type="text" class="form-control form-control-sm" placeholder="Description" id="txtTranDesc" /></td>
+        <td>
+            <select id="ddlGroups" class="form-control form-control-sm" placeholder="Choose Group" onchange="groupsChange(this)">
+
+            </select>
+        </td>
+        <td>
+            <select id="ddlCategories" class="form-control form-control-sm" placeholder="Choose Category" onchange="categoryChange(this)">
+
+            </select>
+        </td>
+        <td>
+            <select class="form-control form-control-sm" id="ddlTranType">
+                <option value="1">Debit</option>
+                <option value="2">Credit</option>
+            </select>
+        </td>
+        <td>
+            <select id="ddlBank" class="form-control form-control-sm" placeholder="Bank">
+
+            </select>
+        </td>
+        <td><input type="number" class="form-control form-control-sm" placeholder="Amount" id="txtTranAmount" /></td>
+        
+        <td colspan="3">
+            <button class="btn btn-sm bg-success btn-success saveBtn">Save</button>
+            <button class="btn btn-sm bg-danger btn-secondary cancelBtn">Cancel</button>
+        </td>
+    `;
+
+    // Add to the top of table body
+    tableBody.prepend(newRow);
+
+    // Cancel button removes the row
+    newRow.querySelector('.cancelBtn').addEventListener('click', () => {
+        newRow.remove();
+    });
+
+    // Save logic can be added here
+    newRow.querySelector('.saveBtn').addEventListener('click', () => {
+        var result = saveTransaction();
+
+        if(result == "Success")
+        {
+            newRow.remove();
+            fetchTransactions();
+        }
+        else
+        {
+            alert("Save " + result);
+            return;
+        }
+
+        
+    });
+
+    $('.payee-select').select2({
+        tags: true,              // allows custom entry
+        placeholder: 'Select or type a new payee',
+        width: 'resolve'         // auto-adjust width
+    });
+
+    fetchGroups();
+    fetchCategories();
+    fetchBankAccounts();
+    fetchVendors();
 
 });
+
 
 function saveTransaction() {
 
     var transactionDate = $("#txtTranDate").val().trim();
 
-    var vendor = $("#ddlVendor").val();
+    var vendor = $(".payee-select").val();
 
     var group = $("#ddlGroups").val();
 
@@ -514,51 +747,35 @@ function saveTransaction() {
     var bank = $("#ddlBank").val();
 
     if (transactionDate == "" || transactionDate == null) {
-        sweetAlert("Oops...", "Choose a valid transaction date", "error");
-
-        return;
+        return "Failed Choose a valid transaction date";
     }
 
     if (vendor == "" || vendor == null) {
-        sweetAlert("Oops...", "Choose a valid Vendor (If prefers nobody, choose Others)", "error");
-
-        return;
+        return "Failed Choose a valid Vendor";
     }
 
     if (group == "" || group == null) {
-        sweetAlert("Oops...", "Choose a valid Group", "error");
-
-        return;
+        return "Failed Choose a valid Group";
     }
 
     if (category == "" || category == null) {
-        sweetAlert("Oops...", "Choose a valid Category", "error");
-
-        return;
+        return "Failed Choose a valid Category";
     }
 
     if (transactionType == "" || transactionType == null) {
-        sweetAlert("Oops...", "Choose a valid transaction type", "error");
-
-        return;
+        return "Failed Choose a valid transaction type";
     }
 
     if (amount == "" || amount == null) {
-        sweetAlert("Oops...", "Enter a valid Amount", "error");
-
-        return;
+        return "Failed Enter a valid Amount";
     }
 
     if (description == "" || description == null) {
-        sweetAlert("Oops...", "Enter a valid description", "error");
-
-        return;
+        return "Failed Enter a valid description";
     }
 
     if (bank == "" || bank == null) {
-        sweetAlert("Oops...", "Choose a valid bank", "error");
-
-        return;
+        return "Failed Choose a valid bank";
     }
 
     let token = localStorage.getItem("AuthToken");
@@ -583,41 +800,37 @@ function saveTransaction() {
         success: function (response) {
 
             if (response.transaction_date != null && response.transaction_date != undefined) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Transaction added Successfully',
-                    icon: 'success',
-                    type: "success",
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.value) {
+                $('#addTransactionModal').modal('hide');
 
-                        document.activeElement.blur();
+                $('#txtTranDate').val("");
 
-                        $('#addTransactionModal').modal('hide');
+                $('#txtTranAmount').val("");
 
-                        $('#txtTranDate').val("");
+                $('#txtTranDesc').val("");
 
-                        $('#txtTranAmount').val("");
+                $('#tableTransactions').DataTable().clear().destroy();
 
-                        $('#txtTranDesc').val("");
+                fetchTransactions();
 
-                        $('#tableTransactions').DataTable().clear().destroy();
-
-                        fetchTransactions();
-                    }
-                });
+                return "Success";
 
             }
         },
         error: function (xhr, status, error) {
-            sweetAlert("Oops...", xhr.responseJSON.error, "error");
+            return "Failed " + xhr.responseJSON.error;
         }
     });
-
-
-
 }
+
+$('#cancelCategoryBtn').on('click', function () {
+    $('#categoryPopup').fadeOut();
+    $('#newCategory').val('');
+});
+
+$('#cancelGroupBtn').on('click', function () {
+    $('#groupPopup').fadeOut();
+    $('#newGroup').val('');
+});
 
 function deleteItem(rowId, type) {
 
