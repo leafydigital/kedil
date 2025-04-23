@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 const allowedOrigins = [
-  "https://6808968d2d6171ccf2cb035c--kedil.netlify.app",
+  "https://kedil.netlify.app",
   "https://wanderbreezeexim.com",
   "http://127.0.0.1:5501",
   "http://localhost:5501",
