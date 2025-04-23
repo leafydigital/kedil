@@ -268,24 +268,14 @@ function saveCategory() {
         success: function (response) {
 
             if (response.category_name != null && response.category_name != undefined) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Category Created Successfully',
-                    icon: 'success',
-                    type: "success",
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.value) {
-                        document.activeElement.blur();
-                        $('#addCategoryModal').modal('hide');
+                document.activeElement.blur();
+                $('#addCategoryModal').modal('hide');
 
-                        $('#txtCategoryName').val("");
+                $('#txtCategoryName').val("");
 
-                        $('#tableCategory').DataTable().clear().destroy();
+                $('#tableCategory').DataTable().clear().destroy();
 
-                        fetchCategories();
-                    }
-                });
+                fetchCategories();
 
             }
         },
@@ -341,20 +331,9 @@ function deleteItem(rowId, type) {
                 success: function (response) {
 
                     if (response.category_name != null && response.category_name != undefined) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Category ' + title + 'ed Successfully',
-                            icon: 'success',
-                            type: "success",
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.value) {
-                                $('#tableCategory').DataTable().clear().destroy();
+                        $('#tableCategory').DataTable().clear().destroy();
 
-                                fetchCategories();
-                            }
-                        });
-
+                        fetchCategories();
                     }
                 },
                 error: function (xhr, status, error) {

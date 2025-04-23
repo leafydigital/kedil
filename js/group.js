@@ -180,21 +180,10 @@ function saveGroupName() {
         success: function (response) {
 
             if (response.group_name != null && response.group_name != undefined) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Group Created Successfully',
-                    icon: 'success',
-                    type: "success",
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.value) {
+                $('#groupPopup').fadeOut();
+                $('#newGroup').val('');
 
-                        $('#groupPopup').fadeOut();
-                        $('#newGroup').val('');
-
-                        loadBudgets();
-                    }
-                });
+                loadBudgets();
 
             }
         },
@@ -241,24 +230,12 @@ function saveCategory() {
         success: function (response) {
 
             if (response.category_name != null && response.category_name != undefined) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Category Created Successfully',
-                    icon: 'success',
-                    type: "success",
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.value) {
+                $('#categoryPopup').fadeOut();
+                $('#newCategory').val('');
 
-                        $('#categoryPopup').fadeOut();
-                        $('#newCategory').val('');
+                selectedGroupId = null;
 
-                        selectedGroupId = null;
-
-                        loadBudgets();
-
-                    }
-                });
+                loadBudgets();
 
             }
         },
@@ -437,8 +414,6 @@ async function loadBudgets() {
             let activityTotal = 0;
             let availableTotal = 0;
 
-
-
             const groupDiv = document.createElement('div');
             groupDiv.className = "accordion-item";
 
@@ -452,7 +427,7 @@ async function loadBudgets() {
                 activityTotal += activity;
                 availableTotal += available;
 
-                totalAssigned += assignedTotal;
+                totalAssigned += assigned;
 
                 return `
     <div class="d-flex budget-row">

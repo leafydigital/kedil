@@ -1,4 +1,4 @@
- var dolab = function(){
+ var kedil = function(){
 	 "use strict"
 	/* Search Bar ============ */
 	var screenWidth = $( window ).width();
@@ -579,7 +579,7 @@
 jQuery(document).ready(function() {
 	$('[data-bs-toggle="popover"]').popover();
     'use strict';
-	dolab.init();
+	kedil.init();
 	
 });
 /* Document.ready END */
@@ -587,9 +587,9 @@ jQuery(document).ready(function() {
 /* Window Load START */
 jQuery(window).on('load',function () {
 	'use strict'; 
-	dolab.load();
+	kedil.load();
 	setTimeout(function(){
-			dolab.handleMenuPosition();
+			kedil.handleMenuPosition();
 	}, 1000);
 	
 });
@@ -597,9 +597,9 @@ jQuery(window).on('load',function () {
 /* Window Resize START */
 jQuery(window).on('resize',function () {
 	'use strict'; 
-	dolab.resize();
+	kedil.resize();
 	setTimeout(function(){
-			dolab.handleMenuPosition();
+			kedil.handleMenuPosition();
 	}, 1000);
 });
 /*  Window Resize END */
