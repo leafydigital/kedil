@@ -37,10 +37,14 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ email: req.body.email });
         if (!user) return res.status(400).json({ message: "User not found" });
 
+        // console.log("User", user.password);
+
+        // console.log("Password", await bcrypt.hash(req.body.password, 10));
+
         const isMatch = await bcrypt.compare(req.body.password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = jwt.sign({ user_id: user._id }, JWT_SECRET, { expiresIn: "30d" });
+        const token = jwt.sign({ user_id: user._id }, JWT_SECRET, { expiresIn: "1d" });
 
         res.status(200).json({ token, user: { id: user._id, name: user.name, email: user.email } });
     } catch (err) {

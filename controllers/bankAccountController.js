@@ -3,7 +3,7 @@ const BankAccount = require('../models/BankAccount');
 // Create bank
 exports.createBankAccount = async (req, res) => {
     try {
-        const existingBank = await BankAccount.findOne({ bank_name: req.body.bank_name, user_id: req.body.user_id });
+        const existingBank = await BankAccount.findOne({ bank_name: req.body.bank_name, user_id: req.body.user_id, is_active: true });
         if (existingBank) {
             return res.status(400).json({ message: 'Bank already exists for this user' });
         }
@@ -24,7 +24,7 @@ exports.createBankAccount = async (req, res) => {
 // Get all banks
 exports.getBankAccounts = async (req, res) => {
     try {
-        const banks = await BankAccount.find({ user_id: req.user.user_id }).populate('user_id');
+        const banks = await BankAccount.find({ user_id: req.user.user_id, is_active: true }).populate('user_id');
         res.status(200).json(banks);
     } catch (err) {
         res.status(500).json({ error: err.message });
