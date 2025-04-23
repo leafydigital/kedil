@@ -1,21 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 🔷 LOGO SWITCH ON HOVER
-    const logo1 = document.querySelector(".brand-title");
-    const logo2 = document.querySelector(".brand-title1");
+	// 🔷 LOGO SWITCH ON HOVER
+	const logo1 = document.querySelector(".brand-title");
+	const logo2 = document.querySelector(".brand-title1");
 
-    // document.querySelector(".brand-logo").addEventListener("mouseenter", () => {
-    //     logo1.style.display = "none";
-    //     logo2.style.display = "block";
-    // });
+	// document.querySelector(".brand-logo").addEventListener("mouseenter", () => {
+	//     logo1.style.display = "none";
+	//     logo2.style.display = "block";
+	// });
 
-    // document.querySelector(".brand-logo").addEventListener("mouseleave", () => {
-    //     logo1.style.display = "block";
-    //     logo2.style.display = "none";
-    // });
+	// document.querySelector(".brand-logo").addEventListener("mouseleave", () => {
+	//     logo1.style.display = "block";
+	//     logo2.style.display = "none";
+	// });
 
 
 	// <li class="">
-    //                     <a class=" " href="groups.html" aria-expanded="false">
+	//                     <a class=" " href="groups.html" aria-expanded="false">
 	// 						<div class="menu-icon">
 	// 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
 	// 								xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	// 					</a>
 	// 				</li>
 	// 				<li class="">
-    //                     <a class=" " href="categories.html" aria-expanded="false">
+	//                     <a class=" " href="categories.html" aria-expanded="false">
 	// 						<div class="menu-icon">
 	// 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
 	// 								xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
@@ -61,11 +61,11 @@ document.addEventListener("DOMContentLoaded", function () {
 	// 					</a>
 	// 				</li>
 
-    
-    // 🔷 SIDEBAR TOGGLE
-    const sidebar = document.querySelector(".dlabnav");
 
-    sidebar.insertAdjacentHTML("afterbegin", `
+	// 🔷 SIDEBAR TOGGLE
+	const sidebar = document.querySelector(".dlabnav");
+
+	sidebar.insertAdjacentHTML("afterbegin", `
         <div class="dlabnav-scroll">
 
 				<ul class="metismenu" id="menu">
@@ -169,9 +169,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			</div>
     `);
 
-    const nav_header = document.querySelector(".nav-header");
+	const nav_header = document.querySelector(".nav-header");
 
-    nav_header.insertAdjacentHTML("afterbegin", `
+	nav_header.insertAdjacentHTML("afterbegin", `
         <a href="index.html" class="brand-logo">
             <div class="logo">
                 <img class="brand-title" src="images/kedil-logo-txt-wte.png" />
@@ -197,10 +197,10 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
     `);
 
-    
-    const footer = document.querySelector(".footer");
 
-    footer.insertAdjacentHTML("afterbegin", `
+	const footer = document.querySelector(".footer");
+
+	footer.insertAdjacentHTML("afterbegin", `
         <div class="copyright">
             <p>Copyright © Designed &amp; Developed by <a href="https://google.com/" target="_blank">
                     Kedil</a> 2025</p>
@@ -208,9 +208,34 @@ document.addEventListener("DOMContentLoaded", function () {
     `);
 });
 
-function setToken()
-{
-	localStorage.setItem("AuthToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjdlYjczZTQ1MTI4NmMyYTAzOGIyNDA0IiwiaWF0IjoxNzQzNzc3MjAwLCJleHAiOjE3NDYzNjkyMDB9.0e21E_ld3HfTifIPv9NoQ36Ztcth-7HK5qR8TbGKGQw");
+function toggleDropdown() {
+	document.getElementById("dropdownMenu").classList.toggle("show");
 }
 
-setToken();
+// Close dropdown if clicked outside
+window.onclick = function (event) {
+	if (!event.target.matches('.profile-btn')) {
+		const dropdowns = document.getElementsByClassName("dropdown");
+		for (let i = 0; i < dropdowns.length; i++) {
+			dropdowns[i].classList.remove('show');
+		}
+	}
+}
+
+function logout() {
+	// Optionally clear localStorage/sessionStorage if you store tokens
+	localStorage.removeItem('AuthToken');
+	window.location.href = './index.html'; // Redirect to login page
+}
+
+function checkToken() {
+	const token = localStorage.getItem("AuthToken");
+
+	if (token == null) {
+		window.location.href = './index.html';
+	}
+
+	//localStorage.setItem("AuthToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjdlYjczZTQ1MTI4NmMyYTAzOGIyNDA0IiwiaWF0IjoxNzQzNzc3MjAwLCJleHAiOjE3NDYzNjkyMDB9.0e21E_ld3HfTifIPv9NoQ36Ztcth-7HK5qR8TbGKGQw");
+}
+
+checkToken();

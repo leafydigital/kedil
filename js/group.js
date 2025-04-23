@@ -1,4 +1,4 @@
-var URL = "http://localhost:5000/api"
+var URL = CONFIG.API_BASE_URL; // "http://localhost:5000/api";
 
 function fetchGroups() {
 
@@ -356,8 +356,7 @@ function sumCreditTransactions(transactions, month, year) {
     transactions.forEach(transaction => {
         const transactionDate = new Date(transaction.transaction_date);
 
-        if(transaction.transaction_type == 'Credit' && transactionDate.getMonth() + 1 == month &&  transactionDate.getFullYear() == year && transaction.is_active == true)
-        {
+        if (transaction.transaction_type == 'Credit' && transactionDate.getMonth() + 1 == month && transactionDate.getFullYear() == year && transaction.is_active == true) {
             unAssignedAmount += transaction.transaction_amount;
         }
 
@@ -438,7 +437,7 @@ async function loadBudgets() {
             let activityTotal = 0;
             let availableTotal = 0;
 
-            
+
 
             const groupDiv = document.createElement('div');
             groupDiv.className = "accordion-item";
@@ -453,25 +452,29 @@ async function loadBudgets() {
                 activityTotal += activity;
                 availableTotal += available;
 
-                totalAssigned += assignedTotal; 
+                totalAssigned += assignedTotal;
 
                 return `
-                    <div class="d-flex budget-row">
-                        <div class="d-flex-gap-20">
-                            <div class="name d-flex">${cat.category_name}</div>
-                        </div>
-                        <div class="header-row">
-                            <div class="assigned ${assigned !== 0 && assigned === available ? 'green-bg' : ''}"> 
-    ₹ <span class="editable-amount" contenteditable="true" data-id="${cat._id}" data-group-id="${groupId}"> 
-        ${assigned.toFixed(2)} 
-    </span>
-</div>
-<div class="activity"> ₹${activity.toFixed(2)} </div>
-<div class="available ${available < 0 ? 'red-bg' : ''}">₹${available.toFixed(2)}</div>
+    <div class="d-flex budget-row">
+        <div class="d-flex-gap-20">
+            <div class="name d-flex">${cat.category_name}</div>
+        </div>
+        <div class="header-row">
+            <div class="assigned ${assigned !== 0 && assigned === available ? 'green-bg' : ''}"> 
+                <span class="editable-amount" contenteditable="true" data-id="${cat._id}" data-group-id="${groupId}"> 
+                    ${assigned < 0 ? `-₹${Math.abs(assigned).toFixed(2)}` : `₹${assigned.toFixed(2)}`}
+                </span>
+            </div>
+            <div class="activity">
+                ${activity < 0 ? `-₹${Math.abs(activity).toFixed(2)}` : `₹${activity.toFixed(2)}`}
+            </div>
+            <div class="available ${available < 0 ? 'red-bg' : ''}">
+                ${available < 0 ? `-₹${Math.abs(available).toFixed(2)}` : `₹${available.toFixed(2)}`}
+            </div>
+        </div>
+    </div>
+`;
 
-                        </div>
-                    </div>
-                `;
             }).join('');
 
             groupDiv.innerHTML = `
@@ -507,24 +510,22 @@ async function loadBudgets() {
 
             container.appendChild(groupDiv);
 
-            
+
 
         });
 
         unAssignedAmount = unAssignedAmount - totalAssigned;
 
-        $("#unassinged-amount").text( "₹ " + unAssignedAmount);
+        $("#unassinged-amount").text("₹ " + unAssignedAmount);
 
-        if(unAssignedAmount < 0)
-        {
+        if (unAssignedAmount < 0) {
             $(".ready-to-assign").addClass("bg-danger");
         }
-        else
-        {
+        else {
             $(".ready-to-assign").addClass("bg-success");
         }
 
-        
+
 
     } catch (err) {
         console.error("Error loading budget UI:", err);
@@ -541,6 +542,26 @@ $('.plus-icon-group').on('click', function (e) {
 
     // Store the clicked row for appending new category
     $('#groupPopup').data('row', $(this).closest('tr'));
+});
+
+
+$('#budgetAccordion').on('click', '.budget-row', function () {
+    // Remove 'selected' class from all rows
+    $('.budget-row').removeClass('selected');
+
+    // Add 'selected' class to the clicked one
+    $(this).addClass('selected');
+
+    const assigned = $(this).find('.assigned .editable-amount').text().replace('₹', '').trim();
+    const activity = $(this).find('.activity').text().replace('₹', '').trim();
+    const available = $(this).find('.available').text().replace('₹', '').trim();
+
+    $("#cur-month-assigned").text("₹ " + assigned);
+
+    $("#cash-spending").text("₹ " + activity);
+
+    //$("#cur-month-assigned").text(assigned);
+
 });
 
 $('#cancelGroupBtn').on('click', function () {
@@ -567,11 +588,6 @@ $('#cancelCategoryBtn').on('click', function () {
     $('#newCategory').val('');
 });
 
-$(".accordion-button").on('click', function () {
-
-    return;
-
-});
 
 $(document).on('click', '.accordion-button', function (e) {
 
@@ -602,57 +618,27 @@ function saveValue(value, element) {
 
     const category_id = element.dataset.id, amount = value, group_id = element.dataset.groupId;
 
-    swal({
-        title: "Warning",
-        text: "Are you sure do you want to update the value?",
-        type: "warning",
-        showCancelButton: !0,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Yes, Update it !!",
-        cancelButtonText: "No, cancel it !!",
-        closeOnConfirm: !1,
-        closeOnCancel: !1
-    }).then((result) => {
-        if (result.value) {
+    const token = localStorage.getItem("AuthToken");
 
-            const token = localStorage.getItem("AuthToken");
+    $.ajax({
+        url: URL + "/budget/create/",
+        method: "POST",
+        contentType: "application/json",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        data: JSON.stringify({
+            budget_category_id: category_id,
+            budget_group_id: group_id,
+            budget_month: month,
+            budget_year: year,
+            assigned_amount: amount
+        }),
+        success: function (response) {
 
-            $.ajax({
-                url: URL + "/budget/create/",
-                method: "POST",
-                contentType: "application/json",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                data: JSON.stringify({
-                    budget_category_id: category_id,
-                    budget_group_id: group_id,
-                    budget_month: month,
-                    budget_year: year,
-                    assigned_amount: amount
-                }),
-                success: function (response) {
-
-                    if (response.assigned_amount != null && response.assigned_amount != undefined) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Updated Successfully',
-                            icon: 'success',
-                            type: "success",
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.value) {
-                                location.reload();
-                            }
-                        });
-
-                    }
-                },
-                error: function (xhr, status, error) {
-                    sweetAlert("Oops...", xhr.responseJSON.message, "error");
-                }
-            });
-
+            if (response.assigned_amount != null && response.assigned_amount != undefined) {
+                location.reload();
+            }
         }
     });
 
@@ -687,3 +673,115 @@ $(document).on('keydown', '.editable-amount', function (e) {
     }
 });
 
+let editingId = null;
+
+// Load all banks from API
+async function renderBanks() {
+    const container = document.getElementById('banksContainer');
+    container.innerHTML = '';
+
+    let token = localStorage.getItem("AuthToken");
+
+    $.ajax({
+        url: URL + "/bankaccount/select",
+        method: "GET",
+        contentType: "application/json",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        data: "",
+        success: function (response) {
+
+            var banks = response;
+
+            banks.forEach((bank) => {
+                container.innerHTML += `
+
+                <div class="col-md-3 dark">
+					<div class="row">
+						<div class="col-md-9">
+							<h3> ${bank.bank_name} </h3>
+							<h4> ${bank.account_type} </h4>
+						</div>
+						<div class="col-md-3">
+							<div class="d-flex gap-2 icons">
+								<a href="#" onclick="openEditForm('${bank._id}', '${bank.bank_name}', '${bank.account_type}')"> <i class="fa fa-edit"></i> </a>
+								<a href="#" onclick="deleteBank('${bank._id}')"> <i class="fa fa-trash"></i> </a>
+							</div>
+						</div>
+					</div>
+				</div>`;
+            });
+        },
+        error: function (xhr, status, error) {
+            sweetAlert("Oops...", xhr.responseJSON.message, "error");
+        }
+    });
+}
+
+function openAddForm() {
+    document.getElementById('bankFormModal').style.display = 'block';
+    editingId = null;
+    document.getElementById('bankNickname').value = '';
+    document.getElementById('accountType').value = '';
+}
+
+function openEditForm(id, nickname, type) {
+    document.getElementById('bankFormModal').style.display = 'block';
+    document.getElementById('bankNickname').value = nickname;
+    document.getElementById('accountType').value = type;
+    editingId = id;
+}
+
+function closeForm() {
+    document.getElementById('bankFormModal').style.display = 'none';
+    editingId = null;
+}
+
+// Save new or updated bank
+async function saveBank() {
+    const bank_name = document.getElementById('bankNickname').value;
+    const account_type = $('#accountType').val();
+
+    let token = localStorage.getItem("AuthToken");
+
+    if (editingId) {
+        await fetch(URL + `/bankaccount/update/${editingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ bank_name, account_type }),
+        });
+    } else {
+        await fetch(URL + '/bankaccount/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ bank_name, account_type }),
+        });
+    }
+
+    closeForm();
+    renderBanks();
+}
+
+// Delete a bank
+async function deleteBank(id) {
+
+    let token = localStorage.getItem("AuthToken");
+
+    const is_active = false;
+
+    await fetch(URL + `/bankaccount/update/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ is_active }),
+    });
+}

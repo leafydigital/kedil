@@ -160,6 +160,7 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
+            align-items: center;
         }
 
         .header-row .name {
@@ -218,6 +219,7 @@
             border-radius: 10px;
             /* background-color: #00b70e; */
             color: white;
+            border: none;
         }
 
         .assign-btn {
@@ -290,7 +292,7 @@
             color: #000;
         }
 
-        .bg-success{
+        .bg-success {
             background-color: #00b70e !important;
         }
 
@@ -337,6 +339,15 @@
             color: #dc3545;
             font-weight: 600;
         }
+
+        #details-accordion .budget-row {
+            border: none !important;
+        }
+
+        .budget-row.selected {
+            background-color: #f0f0f0;
+            border-radius: 15px;
+        }
     </style>
 
 
@@ -356,6 +367,16 @@
                         <div class="dashboard_bar" id="pageTitle">
                             Budget
                         </div>
+                    </div>
+
+                    <div class="header-left">
+                        <div class="profile-container">
+                            <button class="profile-btn" onclick="toggleDropdown()">👤 Admin ▼</button>
+                            <div id="dropdownMenu" class="dropdown">
+                              <a href="profile.html">View Profile</a>
+                              <a href="#" onclick="logout()">Logout</a>
+                            </div>
+                          </div>
                     </div>
                 </div>
             </nav>
@@ -419,62 +440,195 @@
 
             </div>
 
-            <div class="accordion-item m-t-10">
-                <h2 class="accordion-header accordion-heading">
-                    <div class="d-flex">
-                        <div class="d-flex-gap-20">
+            <div class="row">
+
+                <div class="col-md-8">
+                    <div class="accordion-item m-t-10">
+                        <h2 class="accordion-header accordion-heading">
+                            <div class="d-flex">
+                                <div class="d-flex-gap-20">
+                                    <div>
+
+                                    </div>
+                                    <div class="name d-flex">
+                                        CATEGORY
+
+                                        <span>
+                                            <a title="Create New Group"><i class="fa fa-plus plus-icon-group"></i></a>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="header-row">
+                                    <div class="assigned">ASSIGNED</div>
+                                    <div class="activity">ACTIVITY</div>
+                                    <div class="available">AVAILABLE</div>
+                                </div>
+                            </div>
+                        </h2>
+
+                    </div>
+
+                    <div class="accordion" id="budgetAccordion">
+
+                    </div>
+
+
+                    <div class="tooltip-popup" id="groupPopup">
+                        <div class="unassinged-amount">
                             <div>
-
+                                <input type="text" class="form-control" id="newGroup"
+                                    placeholder="New Category Group" />
                             </div>
-                            <div class="name d-flex">
-                                CATEGORY
-
-                                <span>
-                                    <a title="Create New Group"><i class="fa fa-plus plus-icon-group"></i></a>
-                                </span>
-
+                            <div class="d-flex-gap-20">
+                                <button id="addGroupBtn" class="form-control bg-success"
+                                    onclick="saveGroupName()">Save</button>
+                                <button id="cancelGroupBtn" class="form-control bg-danger">Cancel</button>
                             </div>
-
-                        </div>
-                        <div class="header-row">
-                            <div class="assigned">ASSIGNED</div>
-                            <div class="activity">ACTIVITY</div>
-                            <div class="available">AVAILABLE</div>
                         </div>
                     </div>
-                </h2>
 
-            </div>
-
-            <div class="accordion" id="budgetAccordion">
-
-            </div>
-
-
-            <div class="tooltip-popup" id="groupPopup">
-                <div class="unassinged-amount">
-                    <div>
-                        <input type="text" class="form-control" id="newGroup" placeholder="New Category Group" />
-                    </div>
-                    <div class="d-flex-gap-20">
-                        <button id="addGroupBtn" class="form-control bg-success" onclick="saveGroupName()">Save</button>
-                        <button id="cancelGroupBtn" class="form-control bg-danger">Cancel</button>
+                    <div class="tooltip-popup" id="categoryPopup">
+                        <div class="unassinged-amount">
+                            <div>
+                                <input type="text" class="form-control" id="newCategory" placeholder="New Category" />
+                            </div>
+                            <div class="d-flex-gap-20">
+                                <button id="addCategoryBtn" class="form-control bg-success"
+                                    onclick="saveCategory()">Save</button>
+                                <button id="cancelCategoryBtn" class="form-control bg-danger">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="tooltip-popup" id="categoryPopup">
-                <div class="unassinged-amount">
-                    <div>
-                        <input type="text" class="form-control" id="newCategory" placeholder="New Category" />
-                    </div>
-                    <div class="d-flex-gap-20">
-                        <button id="addCategoryBtn" class="form-control bg-success"
-                            onclick="saveCategory()">Save</button>
-                        <button id="cancelCategoryBtn" class="form-control bg-danger">Cancel</button>
+                <div class="col-md-4">
+                    <div class="accordion" id="details-accordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <div class="d-flex">
+                                    <div class="d-flex-gap-20">
+                                        <div>
+                                            <button class="accordion-button custom-accordion-header"
+                                                data-bs-toggle="collapse" aria-expanded="true"
+                                                data-bs-target="#available-balance">
+                                                <span class="accordion-toggle-icon" data-bs-toggle="collapse"
+                                                    data-bs-target="#available-balance" aria-expanded="true"
+                                                    aria-controls="Needs">
+                                                    <i class="arrow-icon fa fa-chevron-down"></i>
+                                                </span>
+                                            </button>
+                                        </div>
+                                        <div class="name d-flex"> Available Balance
+                                        </div>
+                                    </div>
+                                    <div class="header-row">
+                                        <div class="assigned"></div>
+                                        <div class="activity"></div>
+                                        <div class="available" id="available-amount"></div>
+                                    </div>
+                                </div>
+                            </h2>
+                            <div id="available-balance" class="accordion-collapse collapse show">
+                                <div class="accordion-body">
+
+                                    <div class="d-flex budget-row">
+                                        <div class="d-flex-gap-20">
+                                            <div class="name d-flex">Cash Left Over From Last Month</div>
+                                        </div>
+                                        <div class="header-row">
+                                            <div class="assigned ">
+                                            </div>
+                                            <div class="activity"></div>
+                                            <div class="available" id="left-over-cash"> ₹0 </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex budget-row">
+                                        <div class="d-flex-gap-20">
+                                            <div class="name d-flex">Assigned This Month</div>
+                                        </div>
+                                        <div class="header-row">
+                                            <div class="assigned ">
+                                            </div>
+                                            <div class="activity"> </div>
+                                            <div class="available" id="cur-month-assigned">₹0</div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex budget-row">
+                                        <div class="d-flex-gap-20">
+                                            <div class="name d-flex">Cash Spending</div>
+                                        </div>
+                                        <div class="header-row">
+                                            <div class="assigned">
+                                            </div>
+                                            <div class="activity"> </div>
+                                            <div class="available" id="cash-spending">₹0</div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex budget-row">
+                                        <div class="d-flex-gap-20">
+                                            <div class="name d-flex">Credit Spending</div>
+                                        </div>
+                                        <div class="header-row">
+                                            <div class="assigned">
+                                            </div>
+                                            <div class="activity"> </div>
+                                            <div class="available" id="credit-spending">₹0</div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <div class="d-flex">
+                                    <div class="d-flex-gap-20">
+                                        <div>
+                                            <button class="accordion-button custom-accordion-header"
+                                                data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#target">
+                                                <span class="accordion-toggle-icon" data-bs-toggle="collapse"
+                                                    data-bs-target="#target" aria-expanded="true" aria-controls="Needs">
+                                                    <i class="arrow-icon fa fa-chevron-down"></i>
+                                                </span>
+                                            </button>
+                                        </div>
+                                        <div class="name d-flex"> Target
+                                        </div>
+                                    </div>
+                                </div>
+                            </h2>
+                            <div id="target" class="accordion-collapse collapse show">
+                                <div class="accordion-body">
+
+                                    <strong>
+                                        How much do you need for <span id="target-cat"> </span> ?
+                                    </strong>
+
+                                    <p> When you create a target, we'll let you know how much money to set aside to stay
+                                        on track over time? </p>
+
+                                    <button class="ready-to-assign bg-success">
+                                        Create Target
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
+
+
         </div>
 
 
@@ -518,7 +672,11 @@
     <script src="js/custom.min.js"></script>
     <script src="js/dlabnav-init.js"></script>
 
+    <script src="js/config.js"></script>
+
     <script src="js/group.js"></script>
+
+
 
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 

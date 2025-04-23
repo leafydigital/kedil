@@ -57,6 +57,73 @@
 			padding: 15px;
 			border-radius: 15px;
 		}
+
+		.icons {
+			font-size: 15px;
+		}
+
+		.bank-card {
+			background: #27ae60;
+			color: white;
+			padding: 15px;
+			margin: 10px 0;
+			border-radius: 10px;
+			position: relative;
+		}
+
+		.bank-card span {
+			float: right;
+			margin-left: 10px;
+			cursor: pointer;
+		}
+
+		#bankFormModal {
+			background: #fff;
+			padding: 20px;
+			border-radius: 10px;
+			position: absolute;
+			top: 20%;
+			left: 35%;
+			box-shadow: 0px 0px 10px #00000030;
+		}
+
+		.modal-header {
+			background-color: transparent;
+			color: black !important;
+			font-size: 20px;
+		}
+
+		.modal-content {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.modal-content>input,
+		select {
+			border-radius: 10px;
+			height: 40px;
+			padding: 10px;
+		}
+
+		.modal-footer {
+			background-color: transparent;
+			color: black !important;
+			font-size: 20px;
+		}
+
+		.modal-footer>button {
+			border-radius: 10px;
+			height: 40px;
+			padding: 5px;
+			border: none;
+			width: 150px;
+			color: #fff;
+		}
+
+		#bankFormModal{
+			display: none;
+		}
 	</style>
 
 
@@ -77,6 +144,15 @@
 							Bank Accounts
 						</div>
 					</div>
+					<div class="header-left">
+						<div class="profile-container">
+							<button class="profile-btn" onclick="toggleDropdown()">👤 Admin ▼</button>
+							<div id="dropdownMenu" class="dropdown">
+								<a href="profile.html">View Profile</a>
+								<a href="#" onclick="logout()">Logout</a>
+							</div>
+						</div>
+					</div>
 				</div>
 			</nav>
 		</div>
@@ -92,67 +168,39 @@
 			<div class="d-flex align-items-center mb-4 flex-wrap">
 
 				<div class="d-flex-gap-20">
-					<button class="dashboard-select dark" data-bs-toggle="modal" data-bs-target="#addGroupModal"> Add
+					<button class="dashboard-select dark" data-bs-toggle="modal" data-bs-target="#addGroupModal"
+						onclick="openAddForm()"> Add
 						New Bank </button>
 				</div>
 			</div>
+			<div class="row gap-2" id="banksContainer">
+			</div>
+
+
+		</div>
+
+		<div id="bankFormModal">
 			<div class="row">
-				<div class="col-xl-12">
-
-					<div class="col-md-3 dark">
-
-						<div class="row">
-
-							<div class="col-md-3">
-
-								<p>
-									LOGO WILL BE HERE
-								</p>
-
-							</div>
-
-							<div class="col-md-9">
-
-								<h2> Bank's Nick name is here </h2>
-
-								<h2> Bank's name is here </h2>
-
-								<h2> Account number </h2>
-
-							</div>
-
-						</div>
-
-					</div>
-
+				<div class="modal-header col-md-12">
+					<span id="formTitle">Add New Bank</span>
 				</div>
-			</div>
+				<div class="modal-content col-md-12">
+					<input type="text" id="bankNickname" placeholder="Bank Nickname" />
+					<select id="accountType">
+						<option value="" disabled selected>Select Account Type</option>
+						<option value="Savings">Savings</option>
+						<option value="Salary">Salary</option>
+						<option value="Current">Current</option>
+					</select>
+				</div>
+				<div class="modal-footer col-md-12">
 
-
-		</div>
-
-
-		<!-- Modal -->
-		<div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel1">Add Group</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<label for="txtGroupName" class="form-label d-block">Enter Group Name</label>
-						<input type="text" id="txtGroupName" class="form-control w-100 mb-3" placeholder="Group Name">
-
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary btn-sm" onclick="saveGroupName()">Save
-							changes</button>
-					</div>
+					<button onclick="saveBank()" class="bg-success">Save</button>
+					<button onclick="closeForm()" class="bg-danger">Cancel</button>
 				</div>
 			</div>
 		</div>
+
 
 	</div>
 
@@ -188,12 +236,13 @@
 	<script src="js/dlabnav-init.js"></script>
 
 	<script src="js/group.js"></script>
+	<script src="js/config.js"></script>
 
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 	<script>
 
-		//fetchGroups();
+		renderBanks();
 
 	</script>
 

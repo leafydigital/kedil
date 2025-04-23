@@ -114,7 +114,13 @@ function fetchTransactions() {
         ],
         responsive: true,
         paging: true,
-        searching: true
+        searching: true,
+        language: {
+            paginate: {
+              previous: "Prev",
+              next: "Next"
+            }
+          }
     });
 
     let editingRow = null; // To track the currently edited row

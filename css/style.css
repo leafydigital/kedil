@@ -340,7 +340,7 @@ body {
   line-height: var(--bs-body-line-height);
   color: var(--bs-body-color);
   text-align: var(--bs-body-text-align);
-  background-color: #FFF;
+  background-color: #f0ffed !important;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -35476,7 +35476,7 @@ table.dataTable tbody td {
 }
 
 table.dataTable thead th {
-  color: #fff;
+  color: #000;
   white-space: nowrap;
   font-size: 1rem;
   text-transform: capitalize;
@@ -35485,7 +35485,7 @@ table.dataTable thead th {
 }
 
 [data-theme-version="dark"] table.dataTable thead th {
-  color: #fff;
+  color: #000;
 }
 
 @media only screen and (max-width: 87.5rem) {
@@ -35499,7 +35499,7 @@ table.dataTable tbody td {
   font-size: 14px;
   font-weight: 400;
   border-bottom: 0;
-  color: #fff;
+  color: #000;
 }
 
 @media only screen and (max-width: 35.9375rem) {
@@ -35520,12 +35520,12 @@ table.dataTable tr.selected {
 }
 
 table.dataTable tfoot th {
-  color: #fff;
+  color: #000;
   font-weight: 600;
 }
 
 [data-theme-version="dark"] table.dataTable tfoot th {
-  color: #fff;
+  color: #000;
 }
 
 /* .dataTables_wrapper .dataTables_paginate .paginate_button{
@@ -35700,6 +35700,7 @@ table.dataTable tfoot th {
 
 table.dataTable.no-footer {
   border-bottom: 0;
+  background: transparent !important;
 }
 
 .rounded-lg {
@@ -39294,4 +39295,51 @@ input:checked+.slider:before {
   color: #fff;
 }
 
+.logo {
+  display: flex;
+  width: 100px;
+  height: 100px;
+}
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+  min-width: 150px;
+  display: none;
+  z-index: 1000;
+  border-radius: 5px;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown a:hover {
+  background-color: #f5f5f5;
+}
+
+.show {
+  display: block;
+}
 /*# sourceMappingURL=style.css.map */
