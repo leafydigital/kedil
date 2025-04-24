@@ -395,8 +395,6 @@ function sumCreditTransactions(transactions, month, year) {
     return unAssignedAmount;
 }
 
-;
-
 async function loadBudgets() {
     try {
 
