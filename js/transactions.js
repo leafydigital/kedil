@@ -27,25 +27,25 @@ function fetchTransactions() {
             {
                 data: "vendor_id.vendor_name",
                 render: function (data, type, row) {
-                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data}</span>`;
+                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data ? data : ''}</span>`;
                 },
             },
             {
                 data: "transaction_description",
                 render: function (data, type, row) {
-                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data}</span>`;
+                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data ? data : ''}</span>`;
                 },
             },
-            {
-                data: "group_id.group_name",
-                render: function (data, type, row) {
-                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data}</span>`;
-                },
-            },
+            // {
+            //     data: "group_id.group_name",
+            //     render: function (data, type, row) {
+            //         return `<span class="editable" data-id="${row._id}" data-field="group_id">${data ? data : ''}</span>`;
+            //     },
+            // },
             {
                 data: "category_id.category_name",
                 render: function (data, type, row) {
-                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data}</span>`;
+                    return `<span class="editable" data-id="${row._id}" data-field="group_id">${data ? data : ''}</span>`;
                 },
             },
             {
@@ -142,25 +142,46 @@ function fetchTransactions() {
             $rowEl.find("td:eq(0)").html(`<input type="date" class="form-control form-control-sm" value="${transactionDate}" data-field="transaction_date">`);
 
             // Vendor Dropdown
-            let vendorDropdown = `<select class="form-control form-control-sm" data-field="vendor_id">`;
+
+            // let vendorDropdown = `<select class="form-control form-control-sm" data-field="vendor_id">`;
+            // vendors.forEach(v => {
+            //     const selected = v._id === rowData.vendor_id._id ? "selected" : "";
+            //     vendorDropdown += `<option value="${v._id}" ${selected}>${v.vendor_name}</option>`;
+            // });
+            // vendorDropdown += `</select>`;
+            // $rowEl.find("td:eq(1)").html(vendorDropdown);
+
+            let vendorDropdown = `<select class="form-control form-control-sm vendor-select" data-field="vendor_id">`;
+            vendorDropdown += `<option value="">Select Payee</option>`;
+
+            const selectedVendorId = rowData.vendor_id && rowData.vendor_id._id ? rowData.vendor_id._id : "";
+
             vendors.forEach(v => {
-                const selected = v._id === rowData.vendor_id._id ? "selected" : "";
+                const selected = v._id === selectedVendorId ? "selected" : "";
                 vendorDropdown += `<option value="${v._id}" ${selected}>${v.vendor_name}</option>`;
             });
+
             vendorDropdown += `</select>`;
             $rowEl.find("td:eq(1)").html(vendorDropdown);
+
+            // Initialize Select2 with tagging
+            $rowEl.find(".vendor-select").select2({
+                tags: true,
+                placeholder: "Choose or add vendor",
+                width: 'resolve'
+            });
 
             // Description
             $rowEl.find("td:eq(2)").html(`<input type="text" class="form-control form-control-sm" value="${rowData.transaction_description}" data-field="transaction_description">`);
 
-            // Group Dropdown
-            let groupDropdown = `<select class="form-control form-control-sm" data-field="group_id">`;
-            groups.forEach(g => {
-                const selected = g._id === rowData.group_id._id ? "selected" : "";
-                groupDropdown += `<option value="${g._id}" ${selected}>${g.group_name}</option>`;
-            });
-            groupDropdown += `</select>`;
-            $rowEl.find("td:eq(3)").html(groupDropdown);
+            // // Group Dropdown
+            // let groupDropdown = `<select class="form-control form-control-sm" data-field="group_id">`;
+            // groups.forEach(g => {
+            //     const selected = g._id === rowData.group_id._id ? "selected" : "";
+            //     groupDropdown += `<option value="${g._id}" ${selected}>${g.group_name}</option>`;
+            // });
+            // groupDropdown += `</select>`;
+            // $rowEl.find("td:eq(3)").html(groupDropdown);
 
             // Category Dropdown
             let categoryDropdown = `<select class="form-control form-control-sm" data-field="category_id">`;
@@ -169,7 +190,7 @@ function fetchTransactions() {
                 categoryDropdown += `<option value="${c._id}" ${selected}>${c.category_name}</option>`;
             });
             categoryDropdown += `</select>`;
-            $rowEl.find("td:eq(4)").html(categoryDropdown);
+            $rowEl.find("td:eq(3)").html(categoryDropdown);
 
             // Transaction Type Dropdown
             let typeOptions = ['Credit', 'Debit'];
@@ -179,19 +200,19 @@ function fetchTransactions() {
                 typeDropdown += `<option value="${type}" ${selected}>${type}</option>`;
             });
             typeDropdown += `</select>`;
-            $rowEl.find("td:eq(5)").html(typeDropdown);
+            $rowEl.find("td:eq(4)").html(typeDropdown);
 
             // Bank Account Dropdown
             let bankDropdown = `<select class="form-control form-control-sm" data-field="bank_account">`;
             banks.forEach(b => {
                 const selected = b._id === rowData.bank_account._id ? "selected" : "";
-                bankDropdown += `<option value="${b._id}" ${selected}>${b.bank_nick_name}</option>`;
+                bankDropdown += `<option value="${b._id}" ${selected}>${b.bank_name}</option>`;
             });
             bankDropdown += `</select>`;
-            $rowEl.find("td:eq(6)").html(bankDropdown);
+            $rowEl.find("td:eq(5)").html(bankDropdown);
 
             // Amount
-            $rowEl.find("td:eq(7)").html(`<input type="number" class="form-control form-control-sm" value="${rowData.transaction_amount}" data-field="transaction_amount">`);
+            $rowEl.find("td:eq(6)").html(`<input type="number" class="form-control form-control-sm" value="${rowData.transaction_amount}" data-field="transaction_amount">`);
 
             // Change icon to save
             $icon.removeClass("fa-pen-to-square").addClass("fa-floppy-disk");
@@ -203,62 +224,63 @@ function fetchTransactions() {
 
             var vendor = $rowEl.find('td:eq(1) select').val();
 
-            var group = $rowEl.find('td:eq(3) select').val();
-
-            var category = $rowEl.find('td:eq(4) select').val();
-
-            var transactionType = $rowEl.find('td:eq(5) select').val();
-
-            var amount = parseFloat($rowEl.find('td:eq(7) input').val());
-
             var description = $rowEl.find('td:eq(2) input').val();
 
-            var bank = $rowEl.find('td:eq(6) select').val();
+            // var group = $rowEl.find('td:eq(3) select').val();
+
+            var category = $rowEl.find('td:eq(3) select').val();
+
+            var transactionType = $rowEl.find('td:eq(4) select').val();
+
+            var bank = $rowEl.find('td:eq(5) select').val();
+
+            var amount = parseFloat($rowEl.find('td:eq(6) input').val());
 
             if (transactionDate == "" || transactionDate == null) {
-                sweetAlert("Oops...", "Choose a valid transaction date", "error");
+                alert("Choose a valid transaction date");
 
                 return;
             }
 
-            if (vendor == "" || vendor == null) {
-                sweetAlert("Oops...", "Choose a valid Vendor (If prefers nobody, choose Others)", "error");
+            // if (vendor == "" || vendor == null) {
+            //     sweetAlert("Oops...", "Choose a valid Vendor (If prefers nobody, choose Others)", "error");
 
-                return;
-            }
+            //     return;
+            // }
 
-            if (group == "" || group == null) {
-                sweetAlert("Oops...", "Choose a valid Group", "error");
+            // if (group == "" || group == null) {
+            //     sweetAlert("Oops...", "Choose a valid Group", "error");
 
-                return;
-            }
+            //     return;
+            // }
 
             if (category == "" || category == null) {
-                sweetAlert("Oops...", "Choose a valid Category", "error");
+                alert("Choose a valid Category");
 
                 return;
             }
 
             if (transactionType == "" || transactionType == null) {
-                sweetAlert("Oops...", "Choose a valid transaction type", "error");
+                alert("Choose a valid transaction type");
 
                 return;
             }
 
             if (amount == "" || amount == null) {
-                sweetAlert("Oops...", "Enter a valid Amount", "error");
+                alert("Enter a valid Amount");
 
                 return;
             }
 
             if (description == "" || description == null) {
-                sweetAlert("Oops...", "Enter a valid description", "error");
+                // sweetAlert("Oops...", "Enter a valid description", "error");
 
-                return;
+                // return;
+                description = null;
             }
 
             if (bank == "" || bank == null) {
-                sweetAlert("Oops...", "Choose a valid bank", "error");
+                alert("Choose a valid bank");
 
                 return;
             }
@@ -267,49 +289,26 @@ function fetchTransactions() {
                 transaction_date: transactionDate,
                 vendor_id: vendor,
                 transaction_description: description,
-                group_id: group,
                 category_id: category,
                 transaction_type: transactionType,
                 bank_account: bank,
                 transaction_amount: amount
             };
 
-            swal({
-                title: "Warning",
-                text: "Are you sure do you want to update the transaction?",
-                type: "warning",
-                showCancelButton: !0,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, update it !!",
-                cancelButtonText: "No, cancel it !!",
-                closeOnConfirm: !1,
-                closeOnCancel: !1
-            }).then((result) => {
-                if (result.value) {
-                    $.ajax({
-                        url: URL + "/transaction/update/" + rowData._id,
-                        method: "PUT",
-                        contentType: "application/json",
-                        headers: {
-                            "Authorization": "Bearer " + token
-                        },
-                        data: JSON.stringify(updatedData),
-                        success: function (response) {
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Transaction updated successfully.',
-                                icon: 'success',
-                                type: "success",
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                table.ajax.reload();
-                                editingRow = null;
-                            });
-                        },
-                        error: function (xhr) {
-                            sweetAlert("Oops...", xhr.responseJSON.message || "Something went wrong", "error");
-                        }
-                    });
+            $.ajax({
+                url: URL + "/transaction/update/" + rowData._id,
+                method: "PUT",
+                contentType: "application/json",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    table.ajax.reload();
+                    editingRow = null;
+                },
+                error: function (xhr) {
+                    alert("Oops... " + xhr.responseJSON.message || "Something went wrong");
                 }
             });
         }
@@ -357,9 +356,9 @@ function fetchCategories(groupId) {
 
             data.forEach(element => {
 
-                if (element.is_active == true && element.group_id._id == groupId) {
-                    $("#ddlCategories").append("<option value = '" + element._id + "'>" + element.category_name + "</option>");
-                }
+                //if (element.is_active == true && element.group_id._id == groupId) {
+                $("#ddlCategories").append("<option value = '" + element._id + "'>" + element.category_name + "</option>");
+                //}
 
             });
 
@@ -373,7 +372,7 @@ function fetchCategories(groupId) {
 
 function fetchDefault() {
     fetchTransactions();
-    fetchGroups();
+    //fetchGroups();
     fetchCategories();
     fetchBankAccounts();
     fetchVendors();
@@ -435,6 +434,8 @@ function fetchVendors() {
             var data = response;
 
             vendors = data;
+
+            $("#payeeSelect").append("<option value = ''></option>");
 
             data.forEach(element => {
 
@@ -693,12 +694,7 @@ document.getElementById('addTransactionBtn').addEventListener('click', function 
           </select>
         </td>
         <td><input type="text" class="form-control form-control-sm" placeholder="Description" id="txtTranDesc" /></td>
-        <td>
-            <select id="ddlGroups" class="form-control form-control-sm" placeholder="Choose Group" onchange="groupsChange(this)">
-
-            </select>
-        </td>
-        <td>
+          <td>
             <select id="ddlCategories" class="form-control form-control-sm" placeholder="Choose Category" onchange="categoryChange(this)">
 
             </select>
@@ -736,7 +732,7 @@ document.getElementById('addTransactionBtn').addEventListener('click', function 
         saveTransaction(newRow);
 
         if (result == "Success") {
-            
+
             fetchTransactions();
         }
         else {
@@ -767,7 +763,7 @@ function saveTransaction(newRow) {
 
     var vendor = $(".payee-select").val();
 
-    var group = $("#ddlGroups").val();
+    // var group = $("#ddlGroups").val();
 
     var category = $("#ddlCategories").val();
 
@@ -785,15 +781,15 @@ function saveTransaction(newRow) {
 
     }
 
-    if (vendor == "" || vendor == null) {
-        alert("Save Failed Choose a valid Vendor");
-        return;
-    }
+    // if (vendor == "" || vendor == null) {
+    //     alert("Save Failed Choose a valid Vendor");
+    //     return;
+    // }
 
-    if (group == "" || group == null) {
-        alert("Save Failed Choose a valid Group");
-        return;
-    }
+    // if (group == "" || group == null) {
+    //     alert("Save Failed Choose a valid Group");
+    //     return;
+    // }
 
     if (category == "" || category == null) {
         alert("Save Failed Choose a valid Category");
@@ -810,10 +806,10 @@ function saveTransaction(newRow) {
         return;
     }
 
-    if (description == "" || description == null) {
-        alert("Save Failed Enter a valid description");
-        return;
-    }
+    // if (description == "" || description == null) {
+    //     alert("Save Failed Enter a valid description");
+    //     return;
+    // }
 
     if (bank == "" || bank == null) {
         alert("Save Failed Choose a valid bank");
@@ -832,7 +828,7 @@ function saveTransaction(newRow) {
         data: JSON.stringify({
             transaction_date: transactionDate,
             vendor_id: vendor,
-            group_id: group,
+            // group_id: group,
             category_id: category,
             transaction_type: transactionType,
             transaction_amount: amount,
@@ -859,7 +855,7 @@ function saveTransaction(newRow) {
             }
         },
         error: function (xhr, status, error) {
-            alert ("Failed " + xhr.responseJSON.error);
+            alert("Failed " + xhr.responseJSON.error);
         }
     });
 }

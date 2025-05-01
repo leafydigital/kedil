@@ -191,9 +191,6 @@ function saveGroupName() {
             sweetAlert("Oops...", xhr.responseJSON.message, "error");
         }
     });
-
-
-
 }
 
 function saveCategory() {
@@ -201,7 +198,7 @@ function saveCategory() {
     var categoryName = $("#newCategory").val();
 
     if (categoryName == "" || categoryName == null) {
-        sweetAlert("Oops...", "Enter a valid Category Name", "error");
+        alert("Enter a valid Category Name");
 
         return;
     }
@@ -209,14 +206,14 @@ function saveCategory() {
     var groupId = selectedGroupId;
 
     if (groupId == null) {
-        sweetAlert("Oops...", "Group is not matching", "error");
+        alert("Group is not matching");
 
         return;
     }
 
     let token = localStorage.getItem("AuthToken");
 
-    if (groupId == 0) {
+    if (groupId.includes("default-")) {
         $.ajax({
             url: URL + "/groupcategory/creategroup",
             method: "POST",
@@ -256,14 +253,14 @@ function saveCategory() {
                             }
                         },
                         error: function (xhr, status, error) {
-                            sweetAlert("Oops...", xhr.responseJSON.message, "error");
+                            alert("Oops... " + xhr.responseJSON.error);
                         }
                     });
 
                 }
             },
             error: function (xhr, status, error) {
-                sweetAlert("Oops...", xhr.responseJSON.message, "error");
+                alert("Oops... "+ xhr.responseJSON.error);
             }
         });
     }
@@ -294,7 +291,7 @@ function saveCategory() {
                 }
             },
             error: function (xhr, status, error) {
-                sweetAlert("Oops...", xhr.responseJSON.message, "error");
+                alert("Oops... "+ xhr.responseJSON.error);
             }
         });
     }
@@ -409,7 +406,7 @@ async function loadBudgets() {
         const token = localStorage.getItem("AuthToken");
 
         // Fetch all groups, categories, and budgets
-        const [groupsRes, categoriesRes, budgetRes, transactionsRes] = await Promise.all([
+        const [groupsRes, categoriesRes, budgetRes, transactionsRes, bankAccounts] = await Promise.all([
             fetch(URL + "/groupcategory/getgroups", {
                 headers: { Authorization: "Bearer " + token }
             }),
@@ -427,11 +424,16 @@ async function loadBudgets() {
             fetch(URL + "/transaction/select", {
                 headers: { Authorization: "Bearer " + token }
             }),
+            fetch(URL + "/bankaccount/select", {
+                headers: { Authorization: "Bearer " + token }
+            })
         ]);
 
         const groups = await groupsRes.json();
         const categories = await categoriesRes.json();
         const budget = await budgetRes.json(); // budget values
+
+        const bankBalance = await bankAccounts.json();
 
         const transactions = await transactionsRes.json(); // budget values
 
@@ -488,14 +490,14 @@ async function loadBudgets() {
         <div class="header-row">
             <div class="assigned ${assigned !== 0 && assigned === available ? 'green-bg' : ''}"> 
                 <span class="editable-amount" contenteditable="true" data-id="${cat._id}" data-group-id="${groupId}"> 
-                    ${assigned < 0 ? `-₹${Math.abs(assigned).toFixed(2)}` : `₹${assigned.toFixed(2)}`}
+                    ${assigned < 0 ? `-${Math.abs(assigned).toFixed(2)}` : `${assigned.toFixed(2)}`}
                 </span>
             </div>
             <div class="activity">
-                ${activity < 0 ? `-₹${Math.abs(activity).toFixed(2)}` : `₹${activity.toFixed(2)}`}
+                ${activity < 0 ? `-${Math.abs(activity).toFixed(2)}` : `${activity.toFixed(2)}`}
             </div>
             <div class="available ${available < 0 ? 'red-bg' : ''}">
-                ${available < 0 ? `-₹${Math.abs(available).toFixed(2)}` : `₹${available.toFixed(2)}`}
+                ${available < 0 ? `-${Math.abs(available).toFixed(2)}` : `${available.toFixed(2)}`}
             </div>
         </div>
     </div>
@@ -521,9 +523,9 @@ async function loadBudgets() {
                             </div>
                         </div>
                         <div class="header-row">
-                            <div class="assigned">₹${assignedTotal.toFixed(2)}</div>
-                            <div class="activity">₹${activityTotal.toFixed(2)}</div>
-                            <div class="available">₹${availableTotal.toFixed(2)}</div>
+                            <div class="assigned">${assignedTotal.toFixed(2)}</div>
+                            <div class="activity">${activityTotal.toFixed(2)}</div>
+                            <div class="available">${availableTotal.toFixed(2)}</div>
                         </div>
                     </div>
                 </h2>
@@ -540,9 +542,17 @@ async function loadBudgets() {
 
         });
 
-        unAssignedAmount = unAssignedAmount - totalAssigned;
+        let balance = 0;
 
-        $("#unassinged-amount").text("₹ " + unAssignedAmount);
+        bankBalance.forEach(element => {
+
+            balance += element.account_balance;
+            
+        });
+
+        unAssignedAmount = balance - totalAssigned;
+
+        $("#unassinged-amount").text(" " + unAssignedAmount);
 
         if (unAssignedAmount < 0) {
             $(".ready-to-assign").addClass("bg-danger");
@@ -578,13 +588,13 @@ $('#budgetAccordion').on('click', '.budget-row', function () {
     // Add 'selected' class to the clicked one
     $(this).addClass('selected');
 
-    const assigned = $(this).find('.assigned .editable-amount').text().replace('₹', '').trim();
-    const activity = $(this).find('.activity').text().replace('₹', '').trim();
-    const available = $(this).find('.available').text().replace('₹', '').trim();
+    const assigned = $(this).find('.assigned .editable-amount').text().replace('', '').trim();
+    const activity = $(this).find('.activity').text().replace('', '').trim();
+    const available = $(this).find('.available').text().replace('', '').trim();
 
-    $("#cur-month-assigned").text("₹ " + assigned);
+    $("#cur-month-assigned").text(" " + assigned);
 
-    $("#cash-spending").text("₹ " + activity);
+    $("#cash-spending").text(" " + activity);
 
     //$("#cur-month-assigned").text(assigned);
 
@@ -665,7 +675,7 @@ function saveValue(value, element) {
         success: function (response) {
 
             if (response.assigned_amount != null && response.assigned_amount != undefined) {
-                location.reload();
+                loadBudgets();
             }
         }
     });
@@ -730,6 +740,7 @@ async function renderBanks() {
 						<div class="col-md-9">
 							<h3> ${bank.bank_name} </h3>
 							<h4> ${bank.account_type} </h4>
+                            <h4> Balance : ${bank.account_balance} </h4>
 						</div>
 						<div class="col-md-3">
 							<div class="d-flex gap-2 icons">
@@ -768,31 +779,76 @@ function closeForm() {
 
 // Save new or updated bank
 async function saveBank() {
+
+    document.getElementById('bankNickname').style.borderColor = "black";
+    document.getElementById('accountType').style.borderColor = "black";
+    document.getElementById('balance').style.borderColor = "black";
+
     const bank_name = document.getElementById('bankNickname').value;
     const account_type = $('#accountType').val();
 
-    let token = localStorage.getItem("AuthToken");
+    const account_balance = document.getElementById('balance').value;
 
-    if (editingId) {
-        await fetch(URL + `/bankaccount/update/${editingId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({ bank_name, account_type }),
-        });
-    } else {
-        await fetch(URL + '/bankaccount/create/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({ bank_name, account_type }),
-        });
+    if (bank_name == null || bank_name == undefined || bank_name == "") {
+        alert("Please enter the bank name");
+
+        document.getElementById('bankNickname').style.borderColor = "red";
+
+        return;
     }
 
+    if (account_type == null || account_type == undefined || account_type == "") {
+        alert("Please choose account type");
+
+        document.getElementById('accountType').style.borderColor = "red";
+
+        return;
+    }
+
+    if (account_balance == null || account_balance == undefined || account_balance == "" || account_balance < 0) {
+        alert("Please enter a valid initial balance");
+
+        document.getElementById('balance').style.borderColor = "red";
+
+        return;
+    }
+
+    let token = localStorage.getItem("AuthToken");
+
+    try {
+        let response;
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        };
+
+        const body = JSON.stringify({ bank_name, account_type, account_balance });
+
+        if (editingId) {
+            response = await fetch(`${URL}/bankaccount/update/${editingId}`, {
+                method: 'PUT',
+                headers,
+                body
+            });
+        } else {
+            response = await fetch(`${URL}/bankaccount/create/`, {
+                method: 'POST',
+                headers,
+                body
+            });
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Bank account operation failed');
+        }
+
+        const result = await response.json();
+        console.log('Success:', result); // Or update the UI accordingly
+    } catch (error) {
+        console.log('Error: ', error.message + " --> Error is " + error.error);
+    }
     closeForm();
     renderBanks();
 }
