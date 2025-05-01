@@ -7,7 +7,9 @@ function fetchTransactions() {
     let table = $("#tableTransactions").DataTable({
         ajax: {
             url: URL + '/transaction/select', // Replace with actual API URL
-            dataSrc: "",
+            dataSrc: function (json) {
+                return json.filter(item => item.is_active === true);
+            },
             beforeSend: function (xhr) {
                 if (token) {
                     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
@@ -887,53 +889,24 @@ function deleteItem(rowId, type) {
         isDeleted = true;
     }
 
-    swal({
-        title: "Warning",
-        text: "Are you sure do you want to " + title + "?",
-        type: "warning",
-        showCancelButton: !0,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Yes, " + title + " it !!",
-        cancelButtonText: "No, cancel it !!",
-        closeOnConfirm: !1,
-        closeOnCancel: !1
-    }).then((result) => {
-        if (result.value) {
+    $.ajax({
+        url: URL + "/transaction/delete/" + rowId,
+        method: "PUT",
+        contentType: "application/json",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        data: JSON.stringify({
+            is_active: isDeleted
+        }),
+        success: function (response) {
 
-            $.ajax({
-                url: URL + "/transaction/update/" + rowId,
-                method: "PUT",
-                contentType: "application/json",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                data: JSON.stringify({
-                    is_active: isDeleted
-                }),
-                success: function (response) {
+            $('#tableTransactions').DataTable().clear().destroy();
 
-                    if (response.transaction_date != null && response.transaction_date != undefined) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Transaction ' + title + 'ed Successfully',
-                            icon: 'success',
-                            type: "success",
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.value) {
-                                $('#tableTransactions').DataTable().clear().destroy();
-
-                                fetchTransactions();
-                            }
-                        });
-
-                    }
-                },
-                error: function (xhr, status, error) {
-                    sweetAlert("Oops...", xhr.responseJSON.message, "error");
-                }
-            });
-
+            fetchTransactions();
+        },
+        error: function (xhr, status, error) {
+            alert("Oops... " + xhr.responseJSON.error);
         }
     });
 
